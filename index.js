@@ -17,12 +17,37 @@ const id = []
 const teamMembers = []
 
 const appMenu = () => {
-    console.log("Build your team!");
 
-    function buildTeam(){
-
+    function createTeam(){
+        if(!fs.existsSync(OUTPUT_DIR)){
+            fs.mkdirSync(OUTPUT_DIR)
+        }
+fs.writeFileSync(outputPath, render(teamMembers), "utf-8")
     }
 
+    function choice(){
+        inquirer.prompt([
+            {
+                type: "list",
+                name:"TeamMemberChoice",
+                message:"What type of team member would you like to add?",
+                choices: [
+                    "Intern",
+                    "Engineer",
+                    "I don't want to add any other team members."
+                ]
+            }
+        ]).then(userChoice =>{
+            if(userChoice.TeamMemberChoice === "Engineer"){
+                createEngineer();
+            }else if(userChoice.TeamMemberChoice === "Intern"){
+                createIntern();
+            }else{
+                createTeam();
+            }
+        })
+    
+    }
     function createIntern(){
         inquirer.prompt([
             {
@@ -49,7 +74,7 @@ const appMenu = () => {
             const intern = new Intern(answers.internName, answers.internId, answers.internEmail, answers.internSchool);
         teamMembers.push(intern);
         id.push(answers.internId);
-        createTeam();
+        choice();
         })
     }
 
@@ -79,10 +104,11 @@ const appMenu = () => {
             const engineer = new Engineer(answers.engineerName, answers.engineerId, answers.engineerEmail, answers.engineerGithub);
         teamMembers.push(engineer);
         id.push(answers.engineerId);
-        createTeam();
+       choice();
         })
     }
 
+    console.log("Build your team!");
     function createManager(){
         inquirer.prompt([
             {
@@ -109,11 +135,11 @@ const appMenu = () => {
             const manager = new Manager(answers.managerName, answers.managerId, answers.managerEmail, answers.managerOfficeNumber);
         teamMembers.push(manager);
         id.push(answers.managerId);
-        createTeam();
+        choice();
         })
     }
-    createEngineer();
     createManager();
+    
 }
 
 appMenu();
